@@ -1,31 +1,38 @@
-# d2ix: Dynamis - eXtremOS
+# d2ix
 
-TUM Schnittstelle für [MESSAGE_ix](https://github.com/iiasa/message_ix).
+A model input data management and analysis tool for [MESSAGEix](https://github.com/iiasa/message_ix).
 
 ## Installation
 
-1. Python 3.6 via Anaconda installieren: 
-   - dabei darauf achten dass im installer das Häkchen bei "add Anaconda to PATH variable" gesetzt ist)
-   - bei der Nachfrage ob  Visual Studio Code isntalliert werden soll auf ja klicken
+To start using the open source Python package **d2ix**, you must to ensure that your environment is
+equipped with the **MESSAGEix** requirements (Python 3.6 via Anaconda, GAMS and Java) as described
+in the README instructions found alongside the [MESSAGEix](https://github.com/iiasa/message_ix) repository.
+Once all requirements are fulfilled, the cloned or forked **d2ix_public** repository can be installed.
+To install **d2ix**:
 
-2. GAMS installieren (24.9)
-   - Lizenz hinzufügen
 
-3. Git installieren
+1. Install Python via [Anaconda](https://www.continuum.io/downloads). We
+   recommend the latest version, e.g., Python 3.6+.
 
-4. GitKraken istallieren
+2. Install [GAMS](https://www.gams.com/download/). **Importantly**:
 
-5. d2ix klonen
+   - Check the box labeled `Use advanced installation mode`
+   - Check the box labeled `Add GAMS directory to PATH environment variable` on
+     the Advanced Options page.
 
-6. mit der Anaconda Command Promot in den d2ix Ordner navigiern und 
+3. Open a command prompt and type
 
-   6.1 conda environment erstellen: ``conda env create -f environment.yml``
+    ```
+    conda env create -f environment.yml
+    ```
 
-7. d2ix installieren (2 Möglichkeiten):
-    * von GitHub: ``pip install git+https://github.com/tum-ewk/d2ix.git@master``
-    * vom Quellcode: ``pip . install``
+5. To use d2ix, you need to activate the d2ix environment each time. On Windows:
+    ```
+    activate d2ix
+    ```
 
-## Weitere Informationen zu MESSAGEix
+## Further Documentation
 
-- [Tutorials](https://github.com/iiasa/message_ix/tree/master/tutorial)
-- [Dokumentation](https://messageix.iiasa.ac.at/index.html)
+- [MESSAGEix Tutorials](https://github.com/iiasa/message_ix/tree/master/tutorial)
+- [MESSAGEix Documentation](https://messageix.iiasa.ac.at/index.html)
+- [The ix modeling platform (ixmp)](https://github.com/iiasa/ixmp)
