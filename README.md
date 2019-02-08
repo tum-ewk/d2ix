@@ -4,11 +4,11 @@ A model input data management and analysis tool for [MESSAGEix](https://github.c
 
 ## Installation
 
-To start using the open source Python package **d2ix**, you must to ensure that your environment is
-equipped with the **MESSAGEix** requirements (Python 3.6 via Anaconda, GAMS and Java) as described
+To start using the open source Python package *d2ix*, you must to ensure that your environment is
+equipped with the *MESSAGEix* requirements (Python 3.6 via Anaconda, GAMS and Java) as described
 in the README instructions found alongside the [MESSAGEix](https://github.com/iiasa/message_ix) repository.
-Once all requirements are fulfilled, the cloned or forked **d2ix_public** repository can be installed.
-To install **d2ix**:
+Once all requirements are fulfilled, the cloned or forked *d2ix_public* repository can be installed.
+To install *d2ix*:
 
 
 1. Install Python via [Anaconda](https://www.continuum.io/downloads). We
@@ -26,7 +26,7 @@ To install **d2ix**:
     conda env create -f environment.yml
     ```
 
-5. To use d2ix, you need to activate the d2ix environment each time. On Windows:
+5. To use `d2ix`, you need to activate the `d2ix` environment each time. On Windows:
     ```
     activate d2ix
     ```
