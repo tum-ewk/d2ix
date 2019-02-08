@@ -1,0 +1,11 @@
+# dbprops : string
+#    either the name or path/name for a database.properties file
+#    (defaults to folder 'config', file 'default.properties')
+#    or the path/name for a local database (if 'dbtype' not None)
+dbprops: ~/.local/Projekte/Dynamis/message_db/ghd
+
+# dbtype : string
+#    the type of the local database (e.g., 'HSQLDB')
+#    if no 'dbprops' is specified, the local database is
+#    created/accessed at '~/.local/ixmp/localdb/default'
+dbtype: HSQLDB

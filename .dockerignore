@@ -1,0 +1,29 @@
+# from .gitignore
+*.lst
+*.log
+*.idea
+*.pyc
+*.ini
+*.gdx
+*.properties
+*.tmp
+~$*
+.ipynb_checkpoints
+.mypy_cache
+.pytest_cache
+__pycache__
+*/yaml_export
+/config/*.yml
+/output
+/input/scen2xls
+
+
+# Docker
+.git
+.gitignore
+.circleci
+Dockerfile
+README.md
+update_d2ix.bat
+
+

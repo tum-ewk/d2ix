@@ -1,0 +1,21 @@
+name: d2ix
+
+channels:
+    - conda-forge
+
+dependencies:
+    - python=3.6
+    - ruamel.yaml
+    - xarray
+    - dask
+    - numpy
+    - pandas
+    - matplotlib
+    - jupyterlab
+    - seaborn
+    - ipykernel
+    - xlrd
+    - pytables
+    - message-ix
+    - openpyxl
+    - pytest

@@ -1,0 +1,28 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/d2ix
+    docker:
+      - image: docker:17.05.0-ce-git
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build Python3 Image
+          command: docker build --build-arg base_image=tzipperle/d2ix -t d2ix/d2ix:py3 .
+      - run:
+          name: Python3 Flake8
+          command: |
+            docker run d2ix/d2ix:py3 /bin/bash -c 'source activate d2ix && cd /d2ix/ && flake8'
+      - run:
+          name: Python3 MyPy
+          command: |
+            docker run d2ix/d2ix:py3 /bin/bash -c 'source activate d2ix && cd /d2ix/ && python -m mypy --ignore-missing-imports .'
+      - run:
+          name: Python3 Test
+          command: |
+            docker run d2ix/d2ix:py3 /bin/bash -c 'source activate d2ix && cd /d2ix/tests && pytest'
+      - run:
+          name: Python3 Run Tutorial
+          command: |
+            docker run d2ix/d2ix:py3 /bin/bash -c 'source activate d2ix && cd /d2ix && jupyter nbconvert --to script tutorial.ipynb && python tutorial.py'

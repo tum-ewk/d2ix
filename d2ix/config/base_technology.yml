@@ -1,0 +1,22 @@
+default:
+    time: year
+    time_dest: year
+    time_origin: year
+    mode: standard
+
+    output:
+        level: useful
+
+    year_vtg:
+        technical_lifetime:
+            value: 1
+            unit: ???
+        output:
+            value: 1
+            unit: ???
+        var_cost:
+            value: 1.0e+15
+            unit: ???
+        capacity_factor:
+            value: 1
+            unit: ???

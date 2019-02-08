@@ -1,0 +1,9 @@
+pandas
+numpy
+ruamel.yaml
+ixmp
+message-ix
+openpyxl
+xlrd
+matplotlib
+pytest
