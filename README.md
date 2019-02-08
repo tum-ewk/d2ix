@@ -30,6 +30,9 @@ To install *d2ix*:
     ```
     activate d2ix
     ```
+## Tutorials
+
+A introductory tutorial is provided for *d2ix* in the repository under `https://github.com/tum-ewk/d2ix_public/tutorial.ipynb`.
 
 ## Further Documentation
 
