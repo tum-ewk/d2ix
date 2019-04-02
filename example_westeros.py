@@ -1,4 +1,4 @@
-from d2ix import Model
+from d2ix import Model, ModifyModel
 from d2ix import PostProcess
 
 MODEL = 'MESSAGE_Westeros'
@@ -24,6 +24,25 @@ def run_baseline():
     scenario = model.model2db()
     scenario.solve(model='MESSAGE')
     model.close_db()
+
+
+def modify_scenario():
+    mod_model = ModifyModel(run_config=RUN_CONFIG, model=MODEL,
+                            scen='baseline', xls_dir='input/scen2xls',
+                            file_name='data.xlsx',
+                            verbose=VERBOSE)
+
+    mod_model.scen2xls(version=None)
+    mod_model.xls2model(annotation=None)
+
+    tax_emission = mod_model.get_parameter(par='tax_emission')
+    tax_emission['value'] = [0.264, 0.429, 0.699]
+    mod_model.set_parameter(par=tax_emission, name='tax_emission')
+
+    scenario = mod_model.model2db()
+    scenario.solve(model='MESSAGE')
+    mod_model.create_timeseries(scenario)
+    mod_model.close_db()
 
 
 def run_emission_tax():
@@ -67,6 +86,9 @@ def run_postprocessing(version, scen):
 
 if __name__ == '__main__':
     run_baseline()
+    run_postprocessing(version=None, scen='baseline')
+
+    modify_scenario()
     run_postprocessing(version=None, scen='baseline')
 
     run_emission_tax()
