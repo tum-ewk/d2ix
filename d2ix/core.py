@@ -480,11 +480,11 @@ class PostProcess(DBInterface):
 
     def barplot(self, df, filters, title, other_bin_size=0.03,
                 other_name='other', synonyms=False, colors=False,
-                tech_order=None, colormap=None):
+                tech_order=None, colormap=None, set_title=True):
         if isinstance(colormap, str):
             self.attributes['colormap'] = colormap
         create_barplot(df, filters, title, self.attributes, other_bin_size,
-                       other_name, synonyms, colors, tech_order)
+                       other_name, synonyms, colors, tech_order, set_title)
 
     @staticmethod
     def create_plotdata(results):

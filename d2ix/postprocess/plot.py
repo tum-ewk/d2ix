@@ -1,10 +1,13 @@
-import matplotlib.pyplot as plt
 from pathlib import Path
+
+import matplotlib.pyplot as plt
 
 
 def create_barplot(data, filters, title, attributes, other_bin_size,
-                   other_name, synonyms, colors, tech_order):
+                   other_name, synonyms, colors, tech_order, set_title):
     df = data.copy()
+    df = df.dropna()
+
     for k, v in filters.items():
         df = df.loc[df[k].isin(v)].reset_index(drop=True)
 
@@ -53,28 +56,29 @@ def create_barplot(data, filters, title, attributes, other_bin_size,
     if colors:
         if other_name in _plot_df.columns:
             attributes['colors'][other_name] = '#96989b'
-        kwargs['color'] = map(attributes['postprocess']['colors'].get,
-                              _plot_df.columns)
+        kwargs['color'] = map(attributes['colors'].get, _plot_df.columns)
     else:
         kwargs['colormap'] = 'Paired'
     if synonyms:
         _plot_df = _plot_df.rename(columns=attributes['synonyms'])
     _plot_df.plot(**kwargs)
 
-    # Plot Legend
-    handles, labels = ax.get_legend_handles_labels()
-    legend = ax.legend(handles[::-1], labels[::-1], loc='center left',
-                       prop={'size': 10}, bbox_to_anchor=(1.05, 0.5))
-    legend.get_frame().set_facecolor('white')
-    legend.get_frame().set_edgecolor('white')
+    if set_title:
+        ax.set_title(title, fontsize=10)
+        handles, labels = ax.get_legend_handles_labels()
+        legend = ax.legend(handles[::-1], labels[::-1], loc='center left',
+                           prop={'size': 10}, bbox_to_anchor=(1.05, 0.5))
+        legend.get_frame().set_facecolor('white')
+        # Rotate x-tick labels
+        plt.setp(ax.xaxis.get_majorticklabels(), rotation=40, ha='right')
+    else:
+        ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.1), ncol=4,
+                  mode='expand', borderaxespad=0, frameon=False)
+        # Rotate x-tick labels
+        plt.setp(ax.xaxis.get_majorticklabels(), rotation=0)
 
-    # Set title and axis
-    ax.set_title(title, fontsize=10)
     ax.set_ylabel(df['unit'].unique()[0], fontsize=11)
     ax.set_xlabel('')
-
-    # Rotate x-tick labels
-    plt.setp(ax.xaxis.get_majorticklabels(), rotation=40, ha='right')
 
     # Grid & Spines & Ticks
     ax.grid(axis=u'y', which=u'major', color='lightgray', linestyle='-',
