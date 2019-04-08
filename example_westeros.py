@@ -57,9 +57,11 @@ def run_postprocessing(version, scen):
     # Create plots
     tecs = ['coal_ppl', 'wind_ppl']
 
-    pp.barplot(df=df, filters={'technology': tecs, 'variable': ['ACT']},
+    pp.barplot(df=df, filters={'technology': tecs, 'variable': ['ACT'],
+                               'year': [700, 710, 720]},
                title=f'ACT-{scen}', set_title=False)
-    pp.barplot(df=df, filters={'technology': tecs, 'variable': ['CAP']},
+    pp.barplot(df=df, filters={'technology': tecs, 'variable': ['CAP'],
+                               'year': [700, 710, 720]},
                title=f'CAP-{scen}', set_title=False)
 
 
