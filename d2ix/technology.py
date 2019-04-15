@@ -483,14 +483,17 @@ def _comp_int(reference_year, df, par, add_pars, y_typ):
                 else:
                     n = row[_y_type] - reference_year
 
-            val = row['value'] * ((1 + p) ** n)
+            val = row['value'] * (p ** n)
             if row['value'] >= 0:
                 if val < 0:
                     val = 0
         return val
 
     _y_type = f'year_{y_typ}'
-    p = add_pars[f'd_{par}_{y_typ}']
-    if p != 0:
+    p = 1 + add_pars[f'd_{par}_{y_typ}']
+    if p != 1:
+        if par == 'input':
+            # if efficiency is increasing the input goes down and vice versa
+            p = 1 / p
         df['value'] = df.apply(calc_val, axis=1)
     return df
