@@ -6,7 +6,7 @@ with open('requirements.txt') as f:
 
 setup(
     name='d2ix',
-    version='1.3.2',
+    version='1.3.4',
     packages=find_packages(),
     url='https://github.com/tum-ewk/d2ix',
     license='tbd',
