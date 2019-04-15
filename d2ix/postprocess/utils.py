@@ -11,7 +11,8 @@ def create_plotdata_df(results):
 
 def group_data(var, results):
     # TODO: add as variable
-    units = {'ACT': 'GWa/a', 'CAP': 'GW', 'CAP_NEW': 'GW/a'}
+    units = {'ACT': 'GWa/a', 'CAP': 'GW', 'CAP_NEW': 'GW/a',
+             'EMISS': 'MtCO2/a'}
     historicals = {'ACT': 'historical_activity',
                    'CAP_NEW': 'historical_new_capacity'}
     df = results.var(var)
@@ -31,6 +32,18 @@ def group_data(var, results):
         df = df.rename(
             columns={'node_loc': 'node', 'year_act': 'year'})
 
+    elif var == 'EMISS':
+        df_hist = results.par('historical_emission')
+        df_hist = df_hist.rename(
+            columns={'type_emission': 'emission', 'type_year': 'year',
+                     'value': 'lvl'})
+        df_hist = df_hist.loc[df_hist.lvl != 0]
+        df = df.append(df_hist, sort=False)
+        df['year'] = df.year.astype(int)
+
+        df = df[['node', 'emission', 'year', 'lvl']]
+        df = df.groupby(['node', 'year', 'emission'],
+                        as_index=False).sum().copy()
     else:
         df = df[['node_loc', 'technology', 'year_vtg', 'lvl']]
         df = df.groupby(['node_loc', 'year_vtg', 'technology'],
