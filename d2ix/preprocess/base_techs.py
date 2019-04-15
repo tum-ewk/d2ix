@@ -1,4 +1,6 @@
+import copy
 import logging
+
 from d2ix.preprocess.util import get_year_vector
 
 logger = logging.getLogger(__name__)
@@ -19,7 +21,7 @@ def process_base_techs(raw_data, year_vector, first_model_year,
         for c in sorted(com):
             tmp = get_base_techs(default, c, year_vector, first_model_year,
                                  duration_period_sum)
-
+            tmp = copy.deepcopy(dict(tmp))
             base_techs['technology']['slack_' + c] = tmp
 
     logger.debug('Created helper data structure: \'base techs\'')
