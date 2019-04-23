@@ -11,8 +11,8 @@ Once all requirements are fulfilled, the cloned or forked *d2ix_public* reposito
 To install *d2ix*:
 
 
-1. Install Python via [Anaconda](https://www.continuum.io/downloads). We
-   recommend the latest version, e.g., Python 3.6+.
+1. Install Python via [Anaconda](https://www.anaconda.com/distribution/). We
+   recommend the latest version, e.g., Python 3.7+.
 
 2. Install [GAMS](https://www.gams.com/download/). **Importantly**:
 
