@@ -1,3 +1,4 @@
+[![CircleCI](https://circleci.com/gh/tum-ewk/d2ix.svg?style=svg)](https://circleci.com/gh/tum-ewk/d2ix)
 # d2ix
 
 A model input data management and analysis tool for [MESSAGEix](https://github.com/iiasa/message_ix).
