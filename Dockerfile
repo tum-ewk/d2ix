@@ -13,6 +13,9 @@ RUN wget -q https://d37drm4t2jghv5.cloudfront.net/distributions/24.9.2/linux/lin
 	&& rm ./linux_x64_64_sfx.exe
 ENV PATH $PATH:$PWD/gams24.9_linux_x64_64_sfx
 
+# copy repository
+COPY . /d2ix
+
 # install ixmp deps
 RUN conda config --add channels conda-forge \
 	&& conda update -q --yes conda \
@@ -20,6 +23,5 @@ RUN conda config --add channels conda-forge \
     && conda clean --all --yes
 
 # install d2ix
-COPY . /d2ix
 RUN /bin/bash -c 'source activate d2ix && cd /d2ix && pip install .'
 WORKDIR /
