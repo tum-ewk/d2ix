@@ -1,4 +1,7 @@
+import os
 from pathlib import Path
+
+os.environ['NUMEXPR_MAX_THREADS'] = '8'
 
 p = Path(__file__)
 _LOG_CONFIG_FILE = str(p.parent.joinpath('logging.yaml'))
