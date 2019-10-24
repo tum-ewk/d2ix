@@ -4,7 +4,7 @@ channels:
     - conda-forge
 
 dependencies:
-    - python=3.6
+    - python=3.7
     - ruamel.yaml
     - xarray
     - dask
@@ -16,6 +16,8 @@ dependencies:
     - ipykernel
     - xlrd
     - pytables
-    - message-ix
+    - message-ix=1.2.0
     - openpyxl
     - pytest
+    - mypy
+    - flake8
