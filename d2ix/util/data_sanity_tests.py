@@ -29,10 +29,10 @@ def check_input_data(raw_data, model_par):
         plf = plf.reset_index(drop=True)
 
         for i, row in plf.iterrows():
-            _in = input_data[(input_data.node_loc == row['node']) & (input_data.level == row['level']) & (
-                    input_data.commodity == row['commodity'])]['technology'].tolist()
-            _out = output_data[(output_data.node_loc == row['node']) & (output_data.level == row['level']) & (
-                    output_data.commodity == row['commodity'])]['technology'].tolist()
+            _in = input_data[(input_data.node_loc == row['node']) & (input_data.level == row['level']) &
+                             (input_data.commodity == row['commodity'])]['technology'].tolist()
+            _out = output_data[(output_data.node_loc == row['node']) & (output_data.level == row['level']) &
+                               (output_data.commodity == row['commodity'])]['technology'].tolist()
             technologies = list(set(_in + _out))
             rel_felx_techs = \
                 rel_and_flex[(rel_and_flex.commodity == row['commodity']) & (rel_and_flex.node == row['node'])][
