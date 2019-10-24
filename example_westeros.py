@@ -11,12 +11,10 @@ RUN_CONFIG = 'config/run_config.yml'
 
 def run_baseline():
     # launch the IX modeling platform using a local database
-    model = Model(model=MODEL, scen='baseline', base_xls=BASE_XLS,
-                  manual_parameter_xls=MANUAL_PAR_XLS,
-                  historical_data=True, first_historical_year=690,
-                  first_model_year=700, last_model_year=720,
-                  historical_range_year=10, model_range_year=10,
-                  run_config=RUN_CONFIG, verbose=VERBOSE, yaml_export=False)
+    model = Model(model=MODEL, scen='baseline', base_xls=BASE_XLS, manual_parameter_xls=MANUAL_PAR_XLS,
+                  historical_data=True, first_historical_year=690, first_model_year=700, last_model_year=720,
+                  historical_range_year=10, model_range_year=10, run_config=RUN_CONFIG, verbose=VERBOSE,
+                  yaml_export=False)
 
     # Example on how to access and edit parameters manually if neccessary
     # data_par = model.get_parameter(par='demand')
@@ -27,12 +25,10 @@ def run_baseline():
 
 
 def run_emission_tax():
-    model = Model(model=MODEL, scen='emission_tax', base_xls=BASE_XLS,
-                  manual_parameter_xls=MANUAL_PAR_XLS,
-                  historical_data=True, first_historical_year=690,
-                  first_model_year=700, last_model_year=720,
-                  historical_range_year=10, model_range_year=10,
-                  run_config=RUN_CONFIG, verbose=VERBOSE, yaml_export=False)
+    model = Model(model=MODEL, scen='emission_tax', base_xls=BASE_XLS, manual_parameter_xls=MANUAL_PAR_XLS,
+                  historical_data=True, first_historical_year=690, first_model_year=700, last_model_year=720,
+                  historical_range_year=10, model_range_year=10, run_config=RUN_CONFIG, verbose=VERBOSE,
+                  yaml_export=False)
 
     # Add a emission tax
     tax_emission = model.get_parameter(par='tax_emission')
@@ -57,12 +53,10 @@ def run_postprocessing(version, scen):
     # Create plots
     tecs = ['coal_ppl', 'wind_ppl']
 
-    pp.barplot(df=df, filters={'technology': tecs, 'variable': ['ACT'],
-                               'year': [700, 710, 720]},
-               title=f'ACT-{scen}', set_title=False)
-    pp.barplot(df=df, filters={'technology': tecs, 'variable': ['CAP'],
-                               'year': [700, 710, 720]},
-               title=f'CAP-{scen}', set_title=False)
+    pp.barplot(df=df, filters={'technology': tecs, 'variable': ['ACT'], 'year': [700, 710, 720]}, title=f'ACT-{scen}',
+               set_title=False)
+    pp.barplot(df=df, filters={'technology': tecs, 'variable': ['CAP'], 'year': [700, 710, 720]}, title=f'CAP-{scen}',
+               set_title=False)
 
 
 if __name__ == '__main__':

@@ -17,12 +17,10 @@ RUN_CONFIG = 'config/run_config.yml'
 
 def run_scenario():
     # launch the IX modeling platform using a local database
-    model = Model(model=MODEL, scen=SCEN, annotation='first model test',
-                  base_xls=BASE_XLS, manual_parameter_xls=MANUAL_PAR_XLS,
-                  historical_data=True, first_historical_year=F_HIST_Y,
-                  first_model_year=F_MOD_Y, last_model_year=L_MOD_Y,
-                  historical_range_year=HIST_RANGE, model_range_year=MOD_RANGE,
-                  run_config=RUN_CONFIG, verbose=VERBOSE, yaml_export=False)
+    model = Model(model=MODEL, scen=SCEN, annotation='first model test', base_xls=BASE_XLS,
+                  manual_parameter_xls=MANUAL_PAR_XLS, historical_data=True, first_historical_year=F_HIST_Y,
+                  first_model_year=F_MOD_Y, last_model_year=L_MOD_Y, historical_range_year=HIST_RANGE,
+                  model_range_year=MOD_RANGE, run_config=RUN_CONFIG, verbose=VERBOSE, yaml_export=False)
 
     # Example on how to access and edit parameters manually if neccessary
     # data_par = model.get_parameter(par='demand')
@@ -34,9 +32,8 @@ def run_scenario():
 
 
 def modify_scenario():
-    mod_model = ModifyModel(run_config=RUN_CONFIG, model=MODEL, scen=SCEN,
-                            xls_dir='input/scen2xls', file_name='data.xlsx',
-                            verbose=VERBOSE)
+    mod_model = ModifyModel(run_config=RUN_CONFIG, model=MODEL, scen=SCEN, xls_dir='input/scen2xls',
+                            file_name='data.xlsx', verbose=VERBOSE)
 
     mod_model.scen2xls(version=None)
     mod_model.xls2model(annotation=None)
@@ -61,12 +58,9 @@ def run_postprocessing(version=None):
     # Create plots
     tecs = ['coal_ppl', 'bio_ppl', 'electricity_imp', 'slack_electricity']
 
-    pp.barplot(df=df, filters={'technology': tecs, 'variable': ['ACT']},
-               title='ACT - PPL')
-    pp.barplot(df=df, filters={'technology': tecs, 'variable': ['CAP']},
-               title='CAP - PPL')
-    pp.barplot(df=df, filters={'technology': tecs, 'variable': ['CAP_NEW']},
-               title='CAP_NEW - PPL')
+    pp.barplot(df=df, filters={'technology': tecs, 'variable': ['ACT']}, title='ACT - PPL')
+    pp.barplot(df=df, filters={'technology': tecs, 'variable': ['CAP']}, title='CAP - PPL')
+    pp.barplot(df=df, filters={'technology': tecs, 'variable': ['CAP_NEW']}, title='CAP_NEW - PPL')
 
 
 if __name__ == '__main__':
@@ -74,7 +68,7 @@ if __name__ == '__main__':
     run_scenario()
     run_postprocessing(version=None)
 
-    # Option 2: download a scenario from the db and write it to a xlsx file
-    # this file can then be edited and uploaded again.
+    # # Option 2: download a scenario from the db and write it to a xlsx file this file can then be edited and
+    # # uploaded again.
     # modify_scenario()
     # run_postprocessing(version=None)

@@ -1,7 +1,8 @@
+import collections
 import logging
 import logging.config
 from pathlib import Path
-import collections
+
 import pandas as pd
 from ruamel.yaml import YAML, StringIO
 
@@ -95,8 +96,7 @@ def df_to_nested_dict(df):
 def xls_to_yml(path, sheet_name, index=None, yml_name=None):
     p = Path(path)
     if index:
-        df = pd.read_excel(p.absolute(), sheet_name=sheet_name).set_index(
-            index)
+        df = pd.read_excel(p.absolute(), sheet_name=sheet_name).set_index(index)
     else:
         df = pd.read_excel(p.absolute(), sheet_name=sheet_name)
 
@@ -125,8 +125,7 @@ def dict_merge(dct, merge_dct):
     return dct
     """
     for k, v in merge_dct.items():
-        if (k in dct and isinstance(dct[k], dict)
-                and isinstance(merge_dct[k], collections.Mapping)):
+        if (k in dct and isinstance(dct[k], dict) and isinstance(merge_dct[k], collections.Mapping)):
             dict_merge(dct[k], merge_dct[k])
         else:
             dct[k] = merge_dct[k]

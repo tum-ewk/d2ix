@@ -8,8 +8,7 @@ from d2ix.util import df_to_nested_dict
 logger = logging.getLogger(__name__)
 
 
-def process_spec_techs(raw_data, model_data, year_vector, first_model_year,
-                       par_list, duration_period_sum):
+def process_spec_techs(raw_data, model_data, year_vector, first_model_year, par_list, duration_period_sum):
     df = raw_data['base_input']['spec_techs'].copy()
     df = df.set_index('technology', drop=True)
     data = df_to_nested_dict(df)
@@ -26,12 +25,9 @@ def process_spec_techs(raw_data, model_data, year_vector, first_model_year,
         if 'base_techs' in v.keys():
             tech = _base_tech[v['base_techs']]
         else:
-            tech = get_base_techs(default, v['commodity_out1'], year_vector,
-                                  first_model_year, duration_period_sum)
+            tech = get_base_techs(default, v['commodity_out1'], year_vector, first_model_year, duration_period_sum)
         tech_dict = copy.deepcopy(dict(tech))
-        tech_dict = _parse_spec_techs(tech_dict, v, units, year_vector,
-                                      first_model_year, par_list,
-                                      duration_period_sum)
+        tech_dict = _parse_spec_techs(tech_dict, v, units, year_vector, first_model_year, par_list, duration_period_sum)
 
         technology[k] = tech_dict
 
@@ -39,8 +35,7 @@ def process_spec_techs(raw_data, model_data, year_vector, first_model_year,
     return technology
 
 
-def _parse_spec_techs(tech, options, unit, year_vector, first_model_year,
-                      par_list, duration_period_sum):
+def _parse_spec_techs(tech, options, unit, year_vector, first_model_year, par_list, duration_period_sum):
     if options.get('base_techs'):
         del options['base_techs']
     first_tech_year = options.pop('first_year', True)
@@ -51,8 +46,7 @@ def _parse_spec_techs(tech, options, unit, year_vector, first_model_year,
 
     # distinguish different emissions
     emission_type = [i for i in options.keys() if 'emission_factor_' in i]
-    emission = {i.replace('emission_factor_', ''): options[i] for i in
-                emission_type}
+    emission = {i.replace('emission_factor_', ''): options[i] for i in emission_type}
 
     for _em in emission_type:
         options.pop(_em, None)
@@ -71,10 +65,8 @@ def _parse_spec_techs(tech, options, unit, year_vector, first_model_year,
                 options['emission_factor'] = v
 
     # create tech years
-    year_vtg = get_year_vector(year_vector, first_model_year,
-                               options['technical_lifetime'],
-                               duration_period_sum, first_tech_year,
-                               last_tech_year)
+    year_vtg = get_year_vector(year_vector, first_model_year, options['technical_lifetime'], duration_period_sum,
+                               first_tech_year, last_tech_year)
 
     # fill year_vtg historical data
     exist_year = [int(i) for i in tech['year_vtg'].keys()]
@@ -93,16 +85,14 @@ def _parse_spec_techs(tech, options, unit, year_vector, first_model_year,
     keys = [i for i in options.keys() if 'postprocess_' in i]
 
     if keys:
-        tech['postprocess'] = {i.replace('postprocess_', ''): options[i] for i
-                               in keys}
+        tech['postprocess'] = {i.replace('postprocess_', ''): options[i] for i in keys}
         for i in keys:
             del options[i]
 
     # remove helper parameters
     additional_pars = {k: v for k, v in options.items() if k not in par_list}
     if additional_pars:
-        tech['additional_pars'] = {k: v for k, v in additional_pars.items() if
-                                   v != 0}
+        tech['additional_pars'] = {k: v for k, v in additional_pars.items() if v != 0}
 
     options = {k: v for k, v in options.items() if k in par_list}
 

@@ -3,8 +3,8 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 
 
-def create_barplot(data, filters, title, attributes, other_bin_size,
-                   other_name, synonyms, colors, tech_order, set_title):
+def create_barplot(data, filters, title, attributes, other_bin_size, other_name, synonyms, colors, tech_order,
+                   set_title):
     df = data.copy()
     df = df.dropna()
 
@@ -37,8 +37,7 @@ def create_barplot(data, filters, title, attributes, other_bin_size,
     ax = fig.add_subplot(111, facecolor='white')
 
     # Set Plot kwargs
-    kwargs = {'kind': 'bar', 'lw': 0, 'ax': ax,
-              'stacked': True, 'grid': True}
+    kwargs = {'kind': 'bar', 'lw': 0, 'ax': ax, 'stacked': True, 'grid': True}
 
     if isinstance(tech_order, list):
         order = [i for i in _plot_df.columns if i not in tech_order]
@@ -66,14 +65,13 @@ def create_barplot(data, filters, title, attributes, other_bin_size,
     if set_title:
         ax.set_title(title, fontsize=10)
         handles, labels = ax.get_legend_handles_labels()
-        legend = ax.legend(handles[::-1], labels[::-1], loc='center left',
-                           prop={'size': 10}, bbox_to_anchor=(1.05, 0.5))
+        legend = ax.legend(handles[::-1], labels[::-1], loc='center left', prop={'size': 10},
+                           bbox_to_anchor=(1.05, 0.5))
         legend.get_frame().set_facecolor('white')
         # Rotate x-tick labels
         plt.setp(ax.xaxis.get_majorticklabels(), rotation=40, ha='right')
     else:
-        ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.1), ncol=4,
-                  mode='expand', borderaxespad=0, frameon=False)
+        ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.1), ncol=4, mode='expand', borderaxespad=0, frameon=False)
         # Rotate x-tick labels
         plt.setp(ax.xaxis.get_majorticklabels(), rotation=0)
 
@@ -81,18 +79,14 @@ def create_barplot(data, filters, title, attributes, other_bin_size,
     ax.set_xlabel('')
 
     # Grid & Spines & Ticks
-    ax.grid(axis=u'y', which=u'major', color='lightgray', linestyle='-',
-            linewidth=0.5)
+    ax.grid(axis=u'y', which=u'major', color='lightgray', linestyle='-', linewidth=0.5)
     ax.spines['left'].set_color('dimgray')
     ax.spines['bottom'].set_color('dimgray')
-    ax.tick_params(axis=u'both', which=u'both',
-                   length=0, width=0, color='white')
+    ax.tick_params(axis=u'both', which=u'both', length=0, width=0, color='white')
 
     # Save and show Plot
     Path('output').mkdir(exist_ok=True)
-    plt.savefig(f'./output/{title}.pdf', bbox_inches='tight',
-                facecolor=fig.get_facecolor(), edgecolor='none')
-    plt.savefig(f'./output/{title}.png', bbox_inches='tight',
-                facecolor=fig.get_facecolor(), edgecolor='none')
+    plt.savefig(f'./output/{title}.pdf', bbox_inches='tight', facecolor=fig.get_facecolor(), edgecolor='none')
+    plt.savefig(f'./output/{title}.png', bbox_inches='tight', facecolor=fig.get_facecolor(), edgecolor='none')
     fig.tight_layout()
     plt.show()

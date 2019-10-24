@@ -3,11 +3,9 @@ import pandas as pd
 
 logger = logging.getLogger(__name__)
 
-SYN_DICT = {'node': ['node', 'node_loc', 'node_origin', 'node_dest'],
-            'year': ['year', 'year_act', 'year_vtg'], 'emission': ['emission'],
-            'commodity': ['commodity'], 'technology': ['technology'],
-            'level': ['level'], 'mode': ['mode'], 'time': ['time'],
-            'time_origin': ['time_origin'], 'time_dest': ['time_dest']}
+SYN_DICT = {'node': ['node', 'node_loc', 'node_origin', 'node_dest'], 'year': ['year', 'year_act', 'year_vtg'],
+            'emission': ['emission'], 'commodity': ['commodity'], 'technology': ['technology'], 'level': ['level'],
+            'mode': ['mode'], 'time': ['time'], 'time_origin': ['time_origin'], 'time_dest': ['time_dest']}
 
 
 def add_sets(data, model_par, first_model_year):
@@ -15,8 +13,7 @@ def add_sets(data, model_par, first_model_year):
     model_par['lvl_spatial'] = data['lvl_spatial'][0]
 
     # map_spatial_hierarchy
-    hierarchical_nodes = [i.split('.') for i in
-                          data['map_spatial_hierarchy']]
+    hierarchical_nodes = [i.split('.') for i in data['map_spatial_hierarchy']]
     model_par['map_spatial_hierarchy'] = hierarchical_nodes
 
     # nodes
@@ -61,32 +58,25 @@ def _extract_sets_df(scenario, data=None):
     scenario_dict = {i: [i] for i in scenario_sets}
     set_synonyms = {**scenario_dict, **SYN_DICT}
 
-    data_sets = [i for i, v in set_synonyms.items() for k in v if
-                 k in set(data)]
+    data_sets = [i for i, v in set_synonyms.items() for k in v if k in set(data)]
     sets = scenario_sets.intersection(data_sets)
-    sets_dict = {i: [k for k in set_synonyms[i] for s in set(data) if s == k][
-        0] if i in set_synonyms.keys() else i for i in sets}
+    sets_dict = {i: [k for k in set_synonyms[i] for s in set(data) if s == k][0] if i in set_synonyms.keys() else i for
+                 i in sets}
 
-    sets = {i: sorted(data[k].dropna().drop_duplicates().tolist()) for i, k in
-            sets_dict.items()}
+    sets = {i: sorted(data[k].dropna().drop_duplicates().tolist()) for i, k in sets_dict.items()}
 
     return sets
 
 
 def set_order():
-    return ['year', 'node', 'technology', 'relation', 'emission', 'time',
-            'mode', 'grade', 'level', 'commodity', 'rating', 'lvl_spatial',
-            'lvl_temporal', 'type_node', 'type_tec', 'type_year',
-            'type_emission', 'type_relation', 'level_resource',
-            'level_renewable', 'level_stocks', 'cat_node', 'cat_tec',
-            'cat_year', 'cat_emission', 'cat_relation',
-            'map_spatial_hierarchy', 'map_node', 'map_temporal_hierarchy',
-            'map_time', 'land_scenario', 'land_type', 'type_tec_land']
+    return ['year', 'node', 'technology', 'relation', 'emission', 'time', 'mode', 'grade', 'level', 'commodity',
+            'rating', 'lvl_spatial', 'lvl_temporal', 'type_node', 'type_tec', 'type_year', 'type_emission',
+            'type_relation', 'level_resource', 'level_renewable', 'level_stocks', 'cat_node', 'cat_tec', 'cat_year',
+            'cat_emission', 'cat_relation', 'map_spatial_hierarchy', 'map_node', 'map_temporal_hierarchy', 'map_time',
+            'land_scenario', 'land_type', 'type_tec_land']
 
 
 def set_frame_list(scenario, set_dict):
-    _sets = {
-        (k if isinstance(scenario.set(k), pd.Series) else k): (
-            v[0].tolist() if isinstance(scenario.set(k), pd.Series) else v)
-        for k, v in set_dict.items()}
+    _sets = {(k if isinstance(scenario.set(k), pd.Series) else k): (
+        v[0].tolist() if isinstance(scenario.set(k), pd.Series) else v) for k, v in set_dict.items()}
     return _sets

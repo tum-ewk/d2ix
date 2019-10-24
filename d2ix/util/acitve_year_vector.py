@@ -9,8 +9,7 @@ class YearVector(NamedTuple):
     act_years: List[int]
 
 
-def get_act_year_vector(duration_period_sum: pd.DataFrame, vtg_year: int,
-                        life_time: int, first_model_year: int,
+def get_act_year_vector(duration_period_sum: pd.DataFrame, vtg_year: int, life_time: int, first_model_year: int,
                         last_tech_year: int,
                         years_no_hist_cap: List[int]) -> YearVector:
     dps = duration_period_sum.T
@@ -19,8 +18,7 @@ def get_act_year_vector(duration_period_sum: pd.DataFrame, vtg_year: int,
     # remove undefined historical years
     act_years = sorted(list(set(act_years) - set(years_no_hist_cap)))
     act_years = [y for y in act_years if y >= vtg_year]
-    year_pairs = [(y_v, y_a) for y_v, y_a in
-                  itertools.product(act_years, act_years) if
+    year_pairs = [(y_v, y_a) for y_v, y_a in itertools.product(act_years, act_years) if
                   (y_v <= y_a) and (y_a >= first_model_year)]
 
     vintage_years, act_years = zip(*year_pairs)
@@ -28,8 +26,7 @@ def get_act_year_vector(duration_period_sum: pd.DataFrame, vtg_year: int,
     return years_vector
 
 
-def get_years_no_hist_cap(loc: str, tech: str, historical_years: List[int],
-                          tech_hist: pd.DataFrame) -> List[int]:
+def get_years_no_hist_cap(loc: str, tech: str, historical_years: List[int], tech_hist: pd.DataFrame) -> List[int]:
     if not tech_hist.empty:
         _hist_cap_loc_tech = tech_hist[
             (tech_hist['node_loc'] == loc)

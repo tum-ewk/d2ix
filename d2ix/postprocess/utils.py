@@ -11,10 +11,8 @@ def create_plotdata_df(results):
 
 def group_data(var, results):
     # TODO: add as variable
-    units = {'ACT': 'GWa/a', 'CAP': 'GW', 'CAP_NEW': 'GW/a',
-             'EMISS': 'MtCO2/a'}
-    historicals = {'ACT': 'historical_activity',
-                   'CAP_NEW': 'historical_new_capacity'}
+    units = {'ACT': 'GWa/a', 'CAP': 'GW', 'CAP_NEW': 'GW/a', 'EMISS': 'MtCO2/a'}
+    historicals = {'ACT': 'historical_activity', 'CAP_NEW': 'historical_new_capacity'}
     df = results.var(var)
     df = df.loc[df.lvl != 0]
 
@@ -29,27 +27,21 @@ def group_data(var, results):
         df = df[['node_loc', 'technology', 'year_act', 'lvl']]
         df = df.groupby(['node_loc', 'year_act', 'technology'],
                         as_index=False).sum().copy()
-        df = df.rename(
-            columns={'node_loc': 'node', 'year_act': 'year'})
+        df = df.rename(columns={'node_loc': 'node', 'year_act': 'year'})
 
     elif var == 'EMISS':
         df_hist = results.par('historical_emission')
-        df_hist = df_hist.rename(
-            columns={'type_emission': 'emission', 'type_year': 'year',
-                     'value': 'lvl'})
+        df_hist = df_hist.rename(columns={'type_emission': 'emission', 'type_year': 'year', 'value': 'lvl'})
         df_hist = df_hist.loc[df_hist.lvl != 0]
         df = df.append(df_hist, sort=False)
         df['year'] = df.year.astype(int)
 
         df = df[['node', 'emission', 'year', 'lvl']]
-        df = df.groupby(['node', 'year', 'emission'],
-                        as_index=False).sum().copy()
+        df = df.groupby(['node', 'year', 'emission'], as_index=False).sum().copy()
     else:
         df = df[['node_loc', 'technology', 'year_vtg', 'lvl']]
-        df = df.groupby(['node_loc', 'year_vtg', 'technology'],
-                        as_index=False).sum().copy()
-        df = df.rename(
-            columns={'node_loc': 'node', 'year_vtg': 'year'})
+        df = df.groupby(['node_loc', 'year_vtg', 'technology'], as_index=False).sum().copy()
+        df = df.rename(columns={'node_loc': 'node', 'year_vtg': 'year'})
 
     df['unit'] = units[var]
     df['variable'] = var

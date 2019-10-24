@@ -6,10 +6,10 @@ with open('requirements.txt') as f:
 
 setup(
     name='d2ix',
-    version='1.3.4',
+    version='1.3.5',
     packages=find_packages(),
     url='https://github.com/tum-ewk/d2ix',
-    license='tbd',
+    license='Apache License Version 2.0',
     author='Thomas Zipperle und Clara Orthofer',
     author_email='gu47zip@tum.de',
     description='TUM API for the IIASA ixmp modeling platform',

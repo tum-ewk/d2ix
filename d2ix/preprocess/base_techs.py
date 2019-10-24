@@ -6,8 +6,7 @@ from d2ix.preprocess.util import get_year_vector
 logger = logging.getLogger(__name__)
 
 
-def process_base_techs(raw_data, year_vector, first_model_year,
-                       duration_period_sum):
+def process_base_techs(raw_data, year_vector, first_model_year, duration_period_sum):
     dem = raw_data['base_input']['demand'].copy()
     node = dem['node'].unique().tolist()
 
@@ -19,8 +18,7 @@ def process_base_techs(raw_data, year_vector, first_model_year,
     base_techs = {'technology': {}}
     for n, com in sorted(commodity.items()):
         for c in sorted(com):
-            tmp = get_base_techs(default, c, year_vector, first_model_year,
-                                 duration_period_sum)
+            tmp = get_base_techs(default, c, year_vector, first_model_year, duration_period_sum)
             tmp = copy.deepcopy(dict(tmp))
             base_techs['technology']['slack_' + c] = tmp
 
@@ -28,13 +26,11 @@ def process_base_techs(raw_data, year_vector, first_model_year,
     return base_techs['technology']
 
 
-def get_base_techs(default, com, year_vector, first_model_year,
-                   duration_period_sum):
+def get_base_techs(default, com, year_vector, first_model_year, duration_period_sum):
     life_time = default['year_vtg']['technical_lifetime']['value']
     first_tech_year = first_model_year
     last_tech_year = year_vector[-1]
-    years = get_year_vector(year_vector, first_model_year, life_time,
-                            duration_period_sum, first_tech_year,
+    years = get_year_vector(year_vector, first_model_year, life_time, duration_period_sum, first_tech_year,
                             last_tech_year)
 
     year_info = ['last_year', 'first_year']
