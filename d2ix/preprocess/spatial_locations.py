@@ -10,8 +10,7 @@ def process_spatial_locations(_data):
     df['tech'] = 'technology'
     df['override'] = 'override'
 
-    df = df.set_index(['location', 'tech', 'technology', 'override'],
-                      drop=True)
+    df = df.set_index(['location', 'tech', 'technology', 'override'], drop=True)
     data = df_to_nested_dict(df)
     data = {'locations': data}
 

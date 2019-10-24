@@ -26,8 +26,7 @@ def _create_df(data: Dict, dem_loc: str, par: str) -> pd.DataFrame:
     df_par = json_normalize(d.year)
     df_par.index = d.index
     df_par.columns = split_columns(df_par.columns)
-    df_par = pd.concat([pd.DataFrame((df_par.loc[:][i])) for i in
-                        df_par.columns.levels[0]])
+    df_par = pd.concat([pd.DataFrame((df_par.loc[:][i])) for i in df_par.columns.levels[0]])
     df_par.index.rename('year', inplace=True)
     df_par.reset_index(inplace=True)
     return df_par

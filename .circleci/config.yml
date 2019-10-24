@@ -9,7 +9,7 @@ jobs:
       - setup_remote_docker
       - run:
           name: Build Python3 Image
-          command: docker build --build-arg base_image=tzipperle/d2ix -t d2ix/d2ix:py3 .
+          command: docker build -t d2ix/d2ix:py3 .
       - run:
           name: Python3 Flake8
           command: |
