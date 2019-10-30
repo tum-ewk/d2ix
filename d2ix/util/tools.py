@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 class YAMLd2ix(YAML):
-    def dump(self, data, stream=None, **kw):
+    def dump(self, data, stream, **kw):
         inefficient = False
         if stream is None:
             inefficient = True
@@ -55,15 +55,15 @@ def model_data_yml(config, model_par):
             logger.debug(f'Created yaml output file: \'{k}\'')
 
 
-def split_columns(columns, sep='.'):
+def split_columns(columns: pd.core.indexes.base.Index, sep: str = '.') -> pd.MultiIndex:
     if len(columns) == 0:
         return columns
     column_tuples = [tuple(col.split(sep)) for col in columns]
     return pd.MultiIndex.from_tuples(column_tuples)
 
 
-def _retro_dictify(frame):
-    d = {}
+def _retro_dictify(frame: pd.DataFrame) -> dict:
+    d: dict = {}
     for row in frame.values:
         here = d
         for elem in row[:-2]:
@@ -74,7 +74,7 @@ def _retro_dictify(frame):
     return d
 
 
-def _df_to_dict_struct(frame):
+def _df_to_dict_struct(frame: pd.DataFrame) -> pd.DataFrame:
     df = frame.copy()
     if type(df.columns) == pd.core.index.MultiIndex:
         df = df.stack(level=0).stack()
@@ -86,7 +86,7 @@ def _df_to_dict_struct(frame):
     return df
 
 
-def df_to_nested_dict(df):
+def df_to_nested_dict(df: pd.DataFrame) -> dict:
     # create nested dict from DataFrame
     df = _df_to_dict_struct(df)
     d = _retro_dictify(df)
@@ -125,14 +125,14 @@ def dict_merge(dct, merge_dct):
     return dct
     """
     for k, v in merge_dct.items():
-        if (k in dct and isinstance(dct[k], dict) and isinstance(merge_dct[k], collections.Mapping)):
+        if k in dct and isinstance(dct[k], dict) and isinstance(merge_dct[k], collections.Mapping):
             dict_merge(dct[k], merge_dct[k])
         else:
             dct[k] = merge_dct[k]
     return dct
 
 
-def setup_logging(path='logging.yaml', level=logging.INFO):
+def setup_logging(path: str = 'logging.yaml', level: int = logging.INFO) -> None:
     """Setup logging configuration
 
     """

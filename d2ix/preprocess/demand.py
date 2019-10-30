@@ -1,11 +1,12 @@
 import logging
 
+from d2ix import RawData
 from d2ix.util import df_to_nested_dict
 
 logger = logging.getLogger(__name__)
 
 
-def process_demand(raw_data):
+def process_demand(raw_data: RawData) -> dict:
     df = raw_data['base_input']['demand'].copy()
 
     df = df.assign(y='year')

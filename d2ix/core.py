@@ -291,7 +291,7 @@ class Model(DBInterface):
         self.data['units'] = process_units(self.raw_data)
         self.data['technology'].update(
             process_spec_techs(self.raw_data, self.data, self.year_vector, self.first_model_year,
-                               self.scenario.par_list(), self.duration_period_sum))
+                               list(self.scenario.par_list()), self.duration_period_sum))
         self.data['locations'] = process_spatial_locations(self.raw_data)
         self.data['lvl_spatial'] = process_lvl_spatial(self.raw_data)
         self.data['map_spatial_hierarchy'] = process_map_spatial_hierarchy(self.raw_data)

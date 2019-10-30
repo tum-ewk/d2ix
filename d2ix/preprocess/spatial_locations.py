@@ -1,11 +1,12 @@
 import logging
 
+from d2ix import RawData
 from d2ix.util import df_to_nested_dict
 
 logger = logging.getLogger(__name__)
 
 
-def process_spatial_locations(_data):
+def process_spatial_locations(_data: RawData) -> dict:
     df = _data['base_input']['locations'].copy()
     df['tech'] = 'technology'
     df['override'] = 'override'

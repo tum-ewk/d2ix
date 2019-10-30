@@ -1,11 +1,12 @@
 import logging
 
+from d2ix import RawData
 from d2ix.util import df_to_nested_dict
 
 logger = logging.getLogger(__name__)
 
 
-def process_units(_data):
+def process_units(_data: RawData) -> dict:
     df = _data['base_input']['unit'].copy()
     df = df.set_index(['parameter'], drop=True)
     data = df_to_nested_dict(df)

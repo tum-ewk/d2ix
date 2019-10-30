@@ -2,11 +2,14 @@ import logging
 import sys
 
 import numpy as np
+import pandas as pd
+
+from d2ix import ModelPar, RawData
 
 logger = logging.getLogger(__name__)
 
 
-def check_input_data(raw_data, model_par):
+def check_input_data(raw_data: RawData, model_par: ModelPar) -> None:
     logger.debug('Checking input data sanity')
     spec_techs = raw_data['base_input']['spec_techs']
     locations = raw_data['base_input']['locations'].copy()
@@ -21,21 +24,22 @@ def check_input_data(raw_data, model_par):
     # assigned
     if 'peak_load_factor' in raw_data.get('manual_input', {}).keys():
         rel_and_flex = raw_data['base_input']['rel_and_flex'].copy()
-        input_data = model_par['input']
-        output_data = model_par['output']
+        input_data: pd.DataFrame = model_par['input']
+        output_data: pd.DataFrame = model_par['output']
 
         peak_load_factor = raw_data['manual_input']['peak_load_factor']
         plf = peak_load_factor[['node', 'commodity', 'level']].drop_duplicates()
         plf = plf.reset_index(drop=True)
 
         for i, row in plf.iterrows():
-            _in = input_data[(input_data.node_loc == row['node']) & (input_data.level == row['level']) &
-                             (input_data.commodity == row['commodity'])]['technology'].tolist()
-            _out = output_data[(output_data.node_loc == row['node']) & (output_data.level == row['level']) &
-                               (output_data.commodity == row['commodity'])]['technology'].tolist()
+
+            _in = input_data[(input_data['node_loc'] == row['node']) & (input_data['level'] == row['level']) &
+                             (input_data['commodity'] == row['commodity'])]['technology'].tolist()
+            _out = output_data[(output_data['node_loc'] == row['node']) & (output_data['level'] == row['level']) &
+                               (output_data['commodity'] == row['commodity'])]['technology'].tolist()
             technologies = list(set(_in + _out))
             rel_felx_techs = \
-                rel_and_flex[(rel_and_flex.commodity == row['commodity']) & (rel_and_flex.node == row['node'])][
+                rel_and_flex[(rel_and_flex['commodity'] == row['commodity']) & (rel_and_flex['node'] == row['node'])][
                     'technology'].tolist()
 
             not_in_rel_flex = list(set(technologies) - set(rel_felx_techs))

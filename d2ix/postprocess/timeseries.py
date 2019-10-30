@@ -1,11 +1,13 @@
 import logging
+
+import message_ix
 import pandas as pd
 from d2ix.postprocess.utils import group_data
 
 logger = logging.getLogger(__name__)
 
 
-def create_timeseries_df(results):
+def create_timeseries_df(results: message_ix.Scenario) -> message_ix.Scenario:
     logger.info('Create timeseries')
     results.check_out(timeseries_only=True)
     for var in ['ACT', 'CAP', 'CAP_NEW', 'EMISS']:

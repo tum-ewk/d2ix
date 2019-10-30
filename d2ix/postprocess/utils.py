@@ -1,7 +1,8 @@
+import message_ix
 import pandas as pd
 
 
-def create_plotdata_df(results):
+def create_plotdata_df(results: message_ix.Scenario) -> pd.DataFrame:
     df = pd.DataFrame()
     for var in ['ACT', 'CAP', 'CAP_NEW']:
         _df = group_data(var, results)
@@ -9,7 +10,7 @@ def create_plotdata_df(results):
     return df
 
 
-def group_data(var, results):
+def group_data(var: str, results: message_ix.Scenario) -> pd.DataFrame:
     # TODO: add as variable
     units = {'ACT': 'GWa/a', 'CAP': 'GW', 'CAP_NEW': 'GW/a', 'EMISS': 'MtCO2/a'}
     historicals = {'ACT': 'historical_activity', 'CAP_NEW': 'historical_new_capacity'}
@@ -49,7 +50,7 @@ def group_data(var, results):
     return df
 
 
-def extract_synonyms_colors(data):
+def extract_synonyms_colors(data: dict) -> dict:
     post_data = {}
     _tmp = data[['technology', 'synonym']]
     _tmp = _tmp.dropna().set_index('technology')

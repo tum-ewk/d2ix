@@ -1,6 +1,10 @@
 import copy
 import logging
+from typing import Tuple, List, Dict
 
+import pandas as pd
+
+from d2ix import RawData
 from d2ix.preprocess.base_techs import get_base_techs
 from d2ix.preprocess.util import get_year_vector
 from d2ix.util import df_to_nested_dict
@@ -8,7 +12,8 @@ from d2ix.util import df_to_nested_dict
 logger = logging.getLogger(__name__)
 
 
-def process_spec_techs(raw_data, model_data, year_vector, first_model_year, par_list, duration_period_sum):
+def process_spec_techs(raw_data: RawData, model_data: dict, year_vector: List[int], first_model_year: int,
+                       par_list: List[str], duration_period_sum: pd.DataFrame) -> dict:
     df = raw_data['base_input']['spec_techs'].copy()
     df = df.set_index('technology', drop=True)
     data = df_to_nested_dict(df)
@@ -35,7 +40,8 @@ def process_spec_techs(raw_data, model_data, year_vector, first_model_year, par_
     return technology
 
 
-def _parse_spec_techs(tech, options, unit, year_vector, first_model_year, par_list, duration_period_sum):
+def _parse_spec_techs(tech: dict, options: dict, unit: dict, year_vector: List[int], first_model_year: int,
+                      par_list: List[str], duration_period_sum: pd.DataFrame) -> dict:
     if options.get('base_techs'):
         del options['base_techs']
     first_tech_year = options.pop('first_year', True)
@@ -96,17 +102,16 @@ def _parse_spec_techs(tech, options, unit, year_vector, first_model_year, par_li
 
     options = {k: v for k, v in options.items() if k in par_list}
 
-    _tmp_tech = {}
+    _tmp_tech: Dict[str, dict] = {}
     for k, v in options.items():
-        _tmp_tech[k] = {'unit': unit.get(k)['unit']}
-        _tmp_tech[k].update({'value': v})
+        _tmp_tech[k] = {'unit': unit[k]['unit'], 'value': v}
 
     tech['year_vtg'] = dict.fromkeys(year_vtg, _tmp_tech)
 
     return tech
 
 
-def __in_out_efficiency(tech, options):
+def __in_out_efficiency(tech: dict, options: dict) -> Tuple[dict, dict]:
     efficiency1 = options.pop('efficiency_1', None)
     out_lvl1 = options.pop('level_out1', None)
     out_com1 = options.pop('commodity_out1', None)

@@ -13,14 +13,8 @@ _CONFIG_BASE_TECHNOLOGY = str(p.parent.joinpath('config/base_technology.yml'))
 
 ModelPar = Dict[str, Union[pd.DataFrame, list]]
 
-Data = TypedDict('Data', {'demand': dict,
-                          'technology': dict,
-                          'units': dict,
-                          'locations': dict,
-                          'lvl_spatial': list,
-                          'map_spatial_hierarchy': list,
-                          'level_renewable': str,
-                          'level_resource': str,
+Data = TypedDict('Data', {'demand': dict, 'technology': dict, 'units': dict, 'locations': dict, 'lvl_spatial': list,
+                          'map_spatial_hierarchy': list, 'level_renewable': str, 'level_resource': str,
                           'technology_parameter': list})
 
 RawData = TypedDict('RawData', {'base_input': dict, 'base_tech': dict, 'manual_input': dict})
