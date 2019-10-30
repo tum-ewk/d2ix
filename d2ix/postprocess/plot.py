@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 
-def create_barplot(data: pd.DataFramea, filters: Dict[str, list], title: str, attributes: dict, other_bin_size: float,
+def create_barplot(data: pd.DataFrame, filters: Dict[str, list], title: str, attributes: dict, other_bin_size: float,
                    other_name: str, synonyms: bool, colors: bool, tech_order: Optional[list],
                    set_title: bool) -> None:
     df = data.copy()
