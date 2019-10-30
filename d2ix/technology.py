@@ -1,26 +1,31 @@
 import logging
+from typing import List, Dict, Tuple
 
 import numpy as np
 import pandas as pd
 from message_ix.utils import make_df
 from pandas.io.json import json_normalize
 
+from d2ix import Data, ModelPar, RawData
 from d2ix.util import split_columns
 from d2ix.util.acitve_year_vector import get_act_year_vector, get_years_no_hist_cap
 
 logger = logging.getLogger(__name__)
 
+YearVector = List[int]
 
-def add_technology(data, model_par, first_model_year, active_years, historical_years, duration_period_sum, loc, par,
-                   slack=False):
+
+def add_technology(data: Data, model_par: ModelPar, first_model_year: int, active_years: YearVector,
+                   historical_years: YearVector, duration_period_sum: pd.DataFrame, loc: str, par: str,
+                   slack: bool = False) -> ModelPar:
     if slack is True:
-        technology = _get_slack_techs(data, loc, par)
+        technology, technology_exist = _get_slack_techs(data, loc, par)
     else:
-        technology = _get_location_techs(data, loc, par)
+        technology, technology_exist = _get_location_techs(data, loc, par)
 
-    if isinstance(technology, dict):
+    if technology_exist:
         for tech in technology.keys():
-            params = _get_df_tech(technology, tech)
+            params: Dict = _get_df_tech(technology, tech)
             tech_hist = model_par.get('historical_new_capacity')
             years_no_hist_cap = get_years_no_hist_cap(loc, tech, historical_years, tech_hist)
 
@@ -31,8 +36,9 @@ def add_technology(data, model_par, first_model_year, active_years, historical_y
     return model_par
 
 
-def _add_parameter(model_par, params, tech_par, tech, loc, active_years, first_model_year, duration_period_sum,
-                   years_no_hist_cap):
+def _add_parameter(model_par: ModelPar, params: Dict[str, pd.DataFrame], tech_par: str, tech: str, loc: str,
+                   active_years: YearVector, first_model_year: int, duration_period_sum: pd.DataFrame,
+                   years_no_hist_cap: YearVector) -> pd.DataFrame:
     df = model_par[tech_par]
 
     # emission helper
@@ -82,7 +88,9 @@ def _add_parameter(model_par, params, tech_par, tech, loc, active_years, first_m
     return model
 
 
-def _create_parameter_df(params, model_par, df, first_model_year, active_years, duration_period_sum, years_no_hist_cap):
+def _create_parameter_df(params: Dict[str, pd.DataFrame], model_par: str, df: pd.DataFrame, first_model_year: int,
+                         active_years: YearVector, duration_period_sum: pd.DataFrame,
+                         years_no_hist_cap: YearVector) -> pd.DataFrame:
     model_par_vtg = params['year_vtg'][
         (params['year_vtg']['par_name'] == model_par) & (~params['year_vtg']['year_vtg'].isin(years_no_hist_cap))]
 
@@ -133,7 +141,8 @@ def _create_parameter_df(params, model_par, df, first_model_year, active_years, 
     return df
 
 
-def _create_dict_year_act(params, model_par, base_dict, first_model_year, duration_period_sum, years_no_hist_cap):
+def _create_dict_year_act(params: Dict[str, pd.DataFrame], model_par: str, base_dict: Dict, first_model_year: int,
+                          duration_period_sum: pd.DataFrame, years_no_hist_cap: List[int]) -> Dict:
     tec_life = params['year_vtg'][params['year_vtg'].par_name == 'technical_lifetime']
 
     life_val_unit = tec_life[tec_life.par == 'value']
@@ -167,9 +176,9 @@ def _create_dict_year_act(params, model_par, base_dict, first_model_year, durati
     return base_dict
 
 
-def _get_active_model_par(data, _param):
+def _get_active_model_par(data: Data, _param: Dict[str, pd.DataFrame]) -> List[str]:
     tech_model_par = ['technology']
-    tech_model_par.extend(_param['in_out'].index.tolist()),
+    tech_model_par.extend(_param['in_out'].index.tolist())
     tech_model_par.extend(_param['year_vtg'].par_name[~_param['year_vtg'].par_name.duplicated()].values.tolist())
 
     tech_model_par = sorted(list(set(tech_model_par)))
@@ -178,7 +187,8 @@ def _get_active_model_par(data, _param):
     return tech_model_par
 
 
-def _calc_delta_change(active_years, df, par, add_pars):
+def _calc_delta_change(active_years: YearVector, df: pd.DataFrame, par: str,
+                       add_pars: Dict[str, float]) -> pd.DataFrame:
     reference_year = __get_ref_year(df, active_years)
     if f'd_{par}_vtg' in add_pars.keys():
         df = _comp_int(reference_year, df, par, add_pars, 'vtg')
@@ -188,18 +198,18 @@ def _calc_delta_change(active_years, df, par, add_pars):
     return df
 
 
-def add_reliability_flexibility_parameter(data, model_par, raw_data):
+def add_reliability_flexibility_parameter(data: Data, model_par: ModelPar,
+                                          raw_data: RawData) -> Dict[str, pd.DataFrame]:
     rel_flex = raw_data['base_input']['rel_and_flex']
     model = {}
-    rating_bin = []
-    reliability_factor = []
-    flexibility_factor = []
-
+    _rating_bin = []
+    _reliability_factor = []
+    _flexibility_factor = []
     rating_bin_unit = data['units']['rating_bin']['unit']
     reliability_factor_unit = data['units']['reliability_factor']['unit']
     flexibility_factor_unit = data['units']['flexibility_factor']['unit']
 
-    output = model_par['output']
+    output: pd.DataFrame = model_par['output'].copy()
 
     for i in rel_flex.index:
         node = rel_flex.at[i, 'node']
@@ -216,40 +226,41 @@ def add_reliability_flexibility_parameter(data, model_par, raw_data):
         reliability_factor_value = rel_flex.at[i, 'reliability_factor']
         flexibility_factor_value = rel_flex.at[i, 'flexibility_factor']
 
-        model_years = output[output.technology == technology].year_act.unique().tolist()
-        active_years = output[output.technology == technology].year_act.tolist()
-        vintage_years = output[output.technology == technology].year_vtg.tolist()
+        _output_technology = output[output['technology'] == technology]
+        _model_years = list(_output_technology['year_act'].unique())
+        _active_years = list(_output_technology['year_act'])
+        _vintage_years = list(_output_technology['year_vtg'])
 
         base_par = pd.DataFrame(
-            {'node': node, 'technology': technology, 'year_act': model_years, 'commodity': commodity, 'level': level,
+            {'node': node, 'technology': technology, 'year_act': _model_years, 'commodity': commodity, 'level': level,
              'time': time, 'rating': rating})
 
-        rating_bin.append(make_df(base_par, value=rating_bin_value, unit=rating_bin_unit))
+        _rating_bin.append(make_df(base_par, value=rating_bin_value, unit=rating_bin_unit))
 
-        reliability_factor.append(make_df(base_par, value=reliability_factor_value, unit=reliability_factor_unit))
+        _reliability_factor.append(make_df(base_par, value=reliability_factor_value, unit=reliability_factor_unit))
 
         base_flex = pd.DataFrame(
-            {'node_loc': node, 'technology': technology, 'year_act': active_years, 'year_vtg': vintage_years,
+            {'node_loc': node, 'technology': technology, 'year_act': _active_years, 'year_vtg': _vintage_years,
              'commodity': commodity, 'level': level, 'mode': mode, 'time': time, 'rating': rating})
 
-        flexibility_factor.append(make_df(base_flex, value=flexibility_factor_value, unit=flexibility_factor_unit))
+        _flexibility_factor.append(make_df(base_flex, value=flexibility_factor_value, unit=flexibility_factor_unit))
 
-    rating_bin = pd.concat(rating_bin, sort=False, ignore_index=True)
+    rating_bin = pd.concat(_rating_bin, sort=False, ignore_index=True)
     rating_bin['year_act'] = rating_bin['year_act'].astype(int)
     model['rating_bin'] = rating_bin
 
-    reliability_factor = pd.concat(reliability_factor, sort=False, ignore_index=True)
+    reliability_factor = pd.concat(_reliability_factor, sort=False, ignore_index=True)
     reliability_factor['year_act'] = reliability_factor['year_act'].astype(int)
     model['reliability_factor'] = reliability_factor
 
-    flexibility_factor = pd.concat(flexibility_factor, sort=False, ignore_index=True)
+    flexibility_factor = pd.concat(_flexibility_factor, sort=False, ignore_index=True)
     flexibility_factor['year_act'] = flexibility_factor['year_act'].astype(int)
     flexibility_factor['year_vtg'] = flexibility_factor['year_vtg'].astype(int)
     model['flexibility_factor'] = flexibility_factor
     return model
 
 
-def create_renewable_potential(raw_data, data, active_years):
+def create_renewable_potential(raw_data: RawData, data: Data, active_years: YearVector) -> Dict[str, pd.DataFrame]:
     renewable_potential = raw_data['base_input']['renewable_potential']
     model = {}
 
@@ -270,9 +281,9 @@ def create_renewable_potential(raw_data, data, active_years):
     return model
 
 
-def change_emission_factor(raw_data, model_par):
+def change_emission_factor(raw_data: RawData, model_par: ModelPar) -> Dict[str, pd.DataFrame]:
     emissions = raw_data['base_input']['emissions']
-    emission_factor = model_par['emission_factor']
+    emission_factor: pd.DataFrame = model_par['emission_factor']
     model = {}
 
     def apply_change(row):
@@ -293,7 +304,7 @@ def change_emission_factor(raw_data, model_par):
 
 
 # help functions
-def _check_emissions_is_list(params):
+def _check_emissions_is_list(params: Dict[str, pd.DataFrame]) -> bool:
     if 'emission' in params['others'].index:
         if isinstance(params['others'].loc['emission'].val, list):
             _emissions_is_list = True
@@ -304,18 +315,22 @@ def _check_emissions_is_list(params):
     return _emissions_is_list
 
 
-def _get_location_techs(data, loc, par):
+def _get_location_techs(data: Data, loc: str, par: str) -> Tuple[Dict[str, dict], bool]:
     loc_techs = data['locations'][loc].get(par)
     if loc_techs:
-        techs = loc_techs.keys()
+        techs = [*loc_techs.keys()]
         technology = {k: v for k, v in data['technology'].items() if k in techs}
         technology = _override_techs(technology, loc_techs, techs)
+        technology_exist = True
+
     else:
-        technology = None
-    return technology
+        technology = {}
+        technology_exist = False
+
+    return technology, technology_exist
 
 
-def _override_techs(technology, loc_techs, techs):
+def _override_techs(technology: Dict[str, dict], loc_techs: Dict[str, dict], techs: List[str]) -> Dict[str, dict]:
     override = {t: {k: v for k, v in loc_techs[t]['override'].items()} for t in techs}
     for t in techs:
         technology[t].update(override[t])
@@ -323,7 +338,7 @@ def _override_techs(technology, loc_techs, techs):
     return technology
 
 
-def _get_slack_techs(data, loc, par):
+def _get_slack_techs(data, loc: str, par: str) -> Tuple[Dict[str, dict], bool]:
     commodity = [data[par][loc]['year'][i].keys() for i in data[par][loc]['year'].keys()]
     commodity = [i for l in commodity for i in l]
     commodity = sorted(list(set(commodity)))
@@ -333,11 +348,12 @@ def _get_slack_techs(data, loc, par):
         technology['slack_' + c]['node_loc'] = loc
         technology['slack_' + c]['node_dest'] = loc
         technology['slack_' + c]['node_origin'] = loc
+    technology_exist = True
 
-    return technology
+    return technology, technology_exist
 
 
-def _get_df_tech(technology, t):
+def _get_df_tech(technology: Dict[str, dict], t: str) -> Dict[str, dict]:
     _df = pd.DataFrame.from_dict(technology)
     _param = {}
 
@@ -366,7 +382,7 @@ def _get_df_tech(technology, t):
     return _param
 
 
-def __get_df_year(df, year_type):
+def __get_df_year(df: pd.Series, year_type: str) -> pd.DataFrame:
     df[year_type] = {str(k): v for k, v in df[year_type].items()}
     df_par_year = json_normalize(df[year_type])
     df_par_year.columns = split_columns(df_par_year.columns, '.')
@@ -379,7 +395,7 @@ def __get_df_year(df, year_type):
     return df_par_year
 
 
-def __get_ref_year(df, active_years):
+def __get_ref_year(df: pd.DataFrame, active_years: YearVector) -> int:
     if 'year_vtg' in df.columns:
         year = df.at[0, 'year_vtg']
     else:
@@ -394,7 +410,7 @@ def __get_ref_year(df, active_years):
     return ref_year
 
 
-def _comp_int(reference_year, df, par, add_pars, y_typ):
+def _comp_int(reference_year: int, df: pd.DataFrame, par: str, add_pars: dict, y_typ: str) -> pd.DataFrame:
     def calc_val(row):
         if reference_year >= row[_y_type]:
             val = row['value']

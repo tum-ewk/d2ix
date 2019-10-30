@@ -1,12 +1,13 @@
 import logging
 from typing import Dict
+
 import pandas as pd
 from pandas.io.json import json_normalize
+
+from d2ix import ModelPar
 from d2ix.util import split_columns
 
 logger = logging.getLogger(__name__)
-
-ModelPar = Dict[str, pd.DataFrame]
 
 
 def add_demand(data: Dict, model_par: ModelPar, loc: str) -> ModelPar:
