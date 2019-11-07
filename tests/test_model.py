@@ -19,7 +19,6 @@ def baseline_model_config() -> TestConfig:
     return test_config
 
 
-@pytest.mark.first
 def test_model(baseline_model_config):
     model = Model(model=baseline_model_config.model, scen=baseline_model_config.scenario, annotation='first model test',
                   base_xls=baseline_model_config.base_xls,

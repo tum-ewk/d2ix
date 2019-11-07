@@ -72,7 +72,6 @@ def baseline_techs() -> List[TechnologyOut]:
     return _techs
 
 
-@pytest.mark.last
 @pytest.mark.parametrize('tech', baseline_techs(), ids=id_func)
 def test_tech_usable(tech: TechnologyOut, scenario_runner: RunScenario):
     with scenario_runner.make_scenario(clone_model=REF_SCENARIO.model, clone_scenario=REF_SCENARIO.scenario,
