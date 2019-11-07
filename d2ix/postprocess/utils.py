@@ -50,7 +50,7 @@ def group_data(var: str, results: message_ix.Scenario) -> pd.DataFrame:
     return df
 
 
-def extract_synonyms_colors(data: dict) -> dict:
+def extract_synonyms_colors(data: pd.DataFrame) -> dict:
     post_data = {}
     _tmp = data[['technology', 'synonym']]
     _tmp = _tmp.dropna().set_index('technology')

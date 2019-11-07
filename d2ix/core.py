@@ -1,13 +1,14 @@
 import logging
 import sys
 from pathlib import Path
+from typing import Dict, Optional, List, Union
 
 import ixmp as ix
 import message_ix
 import pandas as pd
 from pandas import ExcelWriter
 
-from d2ix import _CONFIG_BASE_TECHNOLOGY
+from d2ix import _CONFIG_BASE_TECHNOLOGY, ModelPar, Data, RawData
 from d2ix import _LOG_CONFIG_FILE
 from d2ix.demand import add_demand
 from d2ix.manual_parameter import add_parameter_manual
@@ -24,17 +25,17 @@ logger = logging.getLogger(__name__)
 
 class MessageInterface(object):
     LOG_LEVEL = 'INFO'
+    config: dict = {}
 
-    def __init__(self, run_config=None, verbose=False):
+    def __init__(self, run_config: Optional[str] = None, verbose: bool = False) -> None:
+
         self._create_logger(verbose)
-        self.config = {}
         self._init_run_config(run_config)
-
         self._mp = self.Platform(self.config['db'])
         self._mp.set_log_level(level=self.LOG_LEVEL)
         self._local_db = self._mp.dbtype == 'HSQLDB'
 
-    def _init_run_config(self, run_config):
+    def _init_run_config(self, run_config: Optional[str]) -> None:
         logger.info('Load data base configurations')
 
         if run_config:
@@ -47,7 +48,7 @@ class MessageInterface(object):
         else:
             self.config['db'] = {'dbprops': None, 'dbtype': 'HSQLDB'}
 
-    def _create_logger(self, verbose):
+    def _create_logger(self, verbose: bool) -> None:
         setup_logging(path=_LOG_CONFIG_FILE, level=getattr(logging, self.LOG_LEVEL))
         if self.LOG_LEVEL == 'NOTSET':
             logging.getLogger('d2ix').propagate = False
@@ -55,20 +56,20 @@ class MessageInterface(object):
             self.LOG_LEVEL = 'DEBUG'
             logging.getLogger('d2ix').setLevel(logging.DEBUG)
 
-    def close_db(self):
+    def close_db(self) -> None:
         logger.debug(f'> Close database at \'{self.config["db"]["dbprops"]}\'')
         self._mp.close_db()
 
-    def open_db(self):
+    def open_db(self) -> None:
         logger.debug(f'> Open database at \'{self.config["db"]["dbprops"]}\'')
         self._mp.open_db()
 
     @staticmethod
-    def Platform(db_config):
+    def Platform(db_config: Dict[str, str]) -> ix.Platform:
         return ix.Platform(dbprops=db_config.get('dbprops'), dbtype=db_config.get('dbtype'))
 
-    def Scenario(self, model, scen, version=None, annotation=None,
-                 cache=False):
+    def Scenario(self, model: str, scen: str, version: Optional[Union[int, str]] = None,
+                 annotation: Optional[str] = None, cache: bool = False) -> message_ix.Scenario:
         """Initialize a new message_ix.Scenario (structured input data and
         solution) or get an existing scenario from the ixmp database instance
         """
@@ -78,17 +79,18 @@ class MessageInterface(object):
 
 
 class DBInterface(MessageInterface):
-    def __init__(self, run_config, verbose, yaml_export=True):
+    scenario: message_ix.Scenario
+    model_type: str
+    year_vector: List[int]
+    data: Data
+    model_par: ModelPar
+    sets: dict
+
+    def __init__(self, run_config: Optional[str], verbose: bool, yaml_export: bool = True) -> None:
         super().__init__(run_config, verbose)
-        self.data = {}
-        self.model_par = {}
-        self.sets = {}
-        self.model_type = None
-        self.year_vector = None
-        self.scenario = None
         self.yaml_export = yaml_export
 
-    def model2db(self):
+    def model2db(self) -> message_ix.Scenario:
         logger.info('Prepare model input data')
         # remove NaN row from data
         for k, v in self.model_par.items():
@@ -133,17 +135,17 @@ class DBInterface(MessageInterface):
             model_data_yml(self.config, self.model_par)
         return self.scenario
 
-    def pull_results(self, model, scen, version):
+    def pull_results(self, model: str, scen: str, version: Optional[Union[int, str]]) -> message_ix.Scenario:
         logger.info(f'Load results for model: \'{model}\', scenario: \'{scen}\', version: \'{version}\'')
         return self.Scenario(model, scen, version)
 
-    def get_parameter(self, par):
+    def get_parameter(self, par: str) -> pd.DataFrame:
         return self.model_par.get(par, None)
 
-    def set_parameter(self, par, name):
+    def set_parameter(self, par: str, name: str) -> None:
         self.model_par[name] = par
 
-    def create_timeseries(self, scenario):
+    def create_timeseries(self, scenario: message_ix.Scenario) -> None:
         self.scenario = create_timeseries_df(results=scenario)
 
 
@@ -158,12 +160,23 @@ class Model(DBInterface):
 
     verbose : boolean
     """
+    data: Data
+    raw_data: RawData
+    model_par: ModelPar
+    active_years: list = []
+    historical_years: list = []
+    year_vector: list = []
+    duration_period: dict = {}
+    duration_period_sum: pd.DataFrame
 
     ENABLE_SLACK_TECHS = True
 
-    def __init__(self, model=None, scen=None, annotation=None, base_xls=None, manual_parameter_xls=None,
-                 historical_data=None, historical_range_year=None, first_historical_year=None, model_range_year=None,
-                 first_model_year=None, last_model_year=None, run_config=None, verbose=False, yaml_export=True):
+    def __init__(self, model: str, scen: str, base_xls: str, historical_range_year: int, first_historical_year: int,
+                 model_range_year: int, first_model_year: int, last_model_year: int,
+                 manual_parameter_xls: Optional[str] = None,
+                 annotation: Optional[str] = None, historical_data: bool = True,
+                 run_config: Optional[str] = None, verbose: bool = False,
+                 yaml_export: bool = True):
         super().__init__(run_config, verbose, yaml_export)
 
         self.config['base_xls'] = base_xls
@@ -182,24 +195,8 @@ class Model(DBInterface):
         self.first_model_year = first_model_year
         self.last_model_year = last_model_year
         self.model_range_year = model_range_year
-        self.active_years = []
-        self.historical_years = []
-        self.year_vector = []
-        self._create_year_vectors()
-
-        self.duration_period = {}
-        self.duration_period_sum = None
         self._calc_duration_period()
-
-        # input data
         self.manual_input = False
-        self.data = {}
-        self.raw_data = {}
-
-        # message data
-        self.model_par = {}
-        self.sets = {}
-
         # create new message scenario
         self.scenario = self.Scenario(model, scen, 'new', annotation)
 
@@ -209,7 +206,7 @@ class Model(DBInterface):
         self._preprocess()
         self._create_model()
 
-    def _create_year_vectors(self):
+    def _create_year_vectors(self) -> None:
         if self.historical_data:
             if not (self.first_historical_year < self.first_model_year
                     < self.last_model_year):
@@ -237,7 +234,7 @@ class Model(DBInterface):
         else:
             self.year_vector = self.active_years
 
-    def _calc_duration_period(self):
+    def _calc_duration_period(self) -> None:
         _years = self.year_vector
 
         self.duration_period[_years[0]] = None
@@ -261,7 +258,7 @@ class Model(DBInterface):
         df = df[self.year_vector]
         self.duration_period_sum = df
 
-    def _load_raw_input_data(self):
+    def _load_raw_input_data(self) -> None:
         logger.info(f'Load model input data from: \'{self.config["base_xls"]}\'')
         pars = ['demand', 'spec_techs', 'unit', 'locations', 'lvl_spatial', 'map_spatial_hierarchy', 'level',
                 'rel_and_flex', 'renewable_potential', 'emissions']
@@ -283,7 +280,7 @@ class Model(DBInterface):
         elif self.config['manual_parameter_xls'] is not None:
             logger.error(f'Path \'{p}\'does not exist')
 
-    def _preprocess(self):
+    def _preprocess(self) -> None:
         logger.debug('Create helper dict structure')
         self.data['demand'] = process_demand(self.raw_data)
         self.data['technology'] = process_base_techs(self.raw_data, self.year_vector, self.first_model_year,
@@ -299,7 +296,7 @@ class Model(DBInterface):
         for k, v in _lvls.items():
             self.data[k] = v
 
-    def _create_model(self):
+    def _create_model(self) -> None:
         # get used parameter
         par_list = list(self.data['units'].keys())
         par_list.remove('demand')
@@ -353,42 +350,40 @@ class Model(DBInterface):
 
 
 class ModifyModel(DBInterface):
-    def __init__(self, run_config=None, model=None, scen=None, xls_dir='scen2xls', file_name='data.xlsx', verbose=False,
-                 yaml_export=True):
+    model_par: ModelPar
+    scenario: message_ix.Scenario
+
+    def __init__(self, model: str, scen: str, run_config: Optional[str] = None,
+                 xls_dir: str = 'scen2xls', file_name: str = 'data.xlsx', verbose: bool = False,
+                 yaml_export: bool = True) -> None:
         super().__init__(run_config, verbose, yaml_export)
         self.model = model
         self.scen = scen
-        self.version = None
-        self.annotation = None
-        self.xls_dir = xls_dir
-        self.file_name = file_name
+        self.version: Optional[Union[int, str]] = None
+        self.annotation: Optional[str] = None
+        self.xls_dir: Path = Path(xls_dir)
+        self.xls_dir.mkdir(exist_ok=True)
+        self.file_name = self.xls_dir.joinpath(file_name)
 
-        self.config['input_path'] = str(Path(xls_dir).joinpath('yaml_export'))
+        self.config['input_path'] = str(self.xls_dir.joinpath('yaml_export'))
         self.model_type = 'modify'
 
-        self.model_par = {}
-        self.sets = {}
-        self.scenario = None  # message_ix Scenario
-
-        self.xls_dir = Path(xls_dir)
-        self.xls_dir.mkdir(exist_ok=True)
-        self.file_name = self.xls_dir.joinpath(self.file_name)
-
-    def get_model_pars(self, version=None):
+    def get_model_pars(self, version: Optional[Union[int, str]] = None) -> None:
         self.scenario = self.pull_results(self.model, self.scen, version)
         self.model_par.update({par: self.scenario.par(par) for par in self.scenario.par_list()})
         self.model_par.update({sets: self.scenario.set(sets) for sets in self.scenario.set_list()})
 
-    def scen2xls(self, version=None):
+    def scen2xls(self, version: Optional[Union[int, str]] = None) -> None:
         self.get_model_pars(version)
 
         logger.info('Write model to excel')
         with ExcelWriter(str(self.file_name)) as writer:
             for k in self.model_par.keys():
-                if not self.model_par[k].empty:
-                    self.model_par[k].to_excel(writer, sheet_name=k)
+                _data: pd.DataFrame = self.model_par[k]
+                if not _data.empty:
+                    _data.to_excel(writer, sheet_name=k)
 
-    def xls2model(self, annotation=None):
+    def xls2model(self, annotation: Optional[str] = None) -> None:
         logger.info('Create model from excel')
         self.model_par = pd.read_excel(self.file_name, sheet_name=None)
         self.version = 'new'
@@ -397,19 +392,20 @@ class ModifyModel(DBInterface):
 
 
 class PostProcess(DBInterface):
+    raw_data: RawData
+    attributes: dict = {}
 
-    def __init__(self, run_config, model, scen, version, base_xls=None, verbose=False):
+    def __init__(self, run_config: Optional[str], model: str, scen: str, version: Optional[Union[int, str]] = None,
+                 base_xls: Optional[str] = None, verbose: bool = False) -> None:
         super().__init__(run_config, verbose)
         self.model = model
         self.scen = scen
         self.version = version
-        self.raw_data = {}
-        self.attributes = {}
         if isinstance(base_xls, str):
             self.base_xls = base_xls
             self._get_synonyms_colors()
 
-    def _get_synonyms_colors(self):
+    def _get_synonyms_colors(self) -> None:
         logger.info(f'Load model input data from: \'{self.base_xls}\'')
         self.raw_data['spec_techs'] = pd.read_excel(self.base_xls, sheet_name='spec_techs')
         _tmp = self.raw_data['spec_techs'].get(['technology', 'postprocess_color', 'postprocess_synonym'])
@@ -419,7 +415,7 @@ class PostProcess(DBInterface):
                 _tmp = _tmp.reset_index(drop=True)
                 self.attributes = extract_synonyms_colors(_tmp)
 
-    def get_results(self):
+    def get_results(self) -> message_ix.Scenario:
         return self.pull_results(self.model, self.scen, self.version)
 
     def barplot(self, df, filters, title, other_bin_size=0.03, other_name='other', synonyms=False, colors=False,
@@ -430,5 +426,5 @@ class PostProcess(DBInterface):
                        set_title)
 
     @staticmethod
-    def create_plotdata(results):
+    def create_plotdata(results: message_ix.Scenario) -> pd.DataFrame:
         return create_plotdata_df(results)

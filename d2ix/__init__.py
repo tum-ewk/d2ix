@@ -17,7 +17,7 @@ Data = TypedDict('Data', {'demand': dict, 'technology': dict, 'units': dict, 'lo
                           'map_spatial_hierarchy': list, 'level_renewable': str, 'level_resource': str,
                           'technology_parameter': list})
 
-RawData = TypedDict('RawData', {'base_input': dict, 'base_tech': dict, 'manual_input': dict})
+RawData = TypedDict('RawData', {'base_input': dict, 'base_tech': dict, 'manual_input': dict, 'spec_techs': dict})
 
 from d2ix.core import Model
 from d2ix.core import PostProcess
