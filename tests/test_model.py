@@ -4,6 +4,19 @@ import pytest
 
 from d2ix import Model
 from d2ix import ModifyModel
+from example import RUN_CONFIG
+from tests.conftest import TestConfig
+
+
+@pytest.fixture(scope='module')
+def baseline_model_config() -> TestConfig:
+    test_config = TestConfig(model='MESSAGE_Indonesia', scenario='Indonesia baseline',
+                             base_xls='../input/modell_data.xlsx',
+                             manual_parameter_xls='../input/manual_input_parameter.xlsx', historical_data=True,
+                             first_historical_year=2010,
+                             first_model_year=2020, last_model_year=2030, historical_range_year=1, model_range_year=5,
+                             run_config=RUN_CONFIG, verbose=False, yaml_export=False)
+    return test_config
 
 
 def test_model(baseline_model_config):
