@@ -21,7 +21,7 @@ jobs:
       - run:
           name: Python3 Test
           command: |
-            docker run d2ix/d2ix:py3 /bin/bash -c 'source activate d2ix && cd /d2ix/tests && pytest test_model.py && pytest test_techs_usable.py'
+            docker run d2ix/d2ix:py3 /bin/bash -c 'source activate d2ix && cd /d2ix/tests && pytest test_baseline.py && pytest --ignore=test_baseline.py'
       - run:
           name: Python3 Run Tutorial
           command: |

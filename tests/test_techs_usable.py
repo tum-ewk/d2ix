@@ -17,7 +17,7 @@ SELECTED_TECHNOLOGIES = False
 technology_selection = [TechnologyOut(technology='coal_imp', commodity='coal', level='primary')]
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='module')
 def scenario_runner() -> RunScenario:
     runner = RunScenario(RUN_CONFIG, log_level='NOTSET')
     return runner
@@ -53,7 +53,7 @@ def techs_same_lvl_com(scenario: message_ix.Scenario, level: str, commodity: str
     return techs
 
 
-def id_func(param):
+def id_func(param: TechnologyOut) -> str:
     return repr(param)
 
 
@@ -73,7 +73,7 @@ def baseline_techs() -> List[TechnologyOut]:
 
 
 @pytest.mark.parametrize('tech', baseline_techs(), ids=id_func)
-def test_tech_usable(tech: TechnologyOut, scenario_runner: RunScenario):
+def test_tech_usable(tech: TechnologyOut, scenario_runner: RunScenario) -> None:
     with scenario_runner.make_scenario(clone_model=REF_SCENARIO.model, clone_scenario=REF_SCENARIO.scenario,
                                        new_scenario_name='py-test') as scenario:
         techs = techs_same_lvl_com(scenario=scenario, level=tech.level, commodity=tech.commodity)
