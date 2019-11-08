@@ -19,7 +19,7 @@ def baseline_model_config() -> TestConfig:
     return test_config
 
 
-def test_model(baseline_model_config):
+def test_model(baseline_model_config: TestConfig) -> None:
     model = Model(model=baseline_model_config.model, scen=baseline_model_config.scenario, annotation='first model test',
                   base_xls=baseline_model_config.base_xls,
                   manual_parameter_xls=baseline_model_config.manual_parameter_xls,
@@ -39,7 +39,7 @@ def test_model(baseline_model_config):
     model.close_db()
 
 
-def test_model_without_historical(baseline_model_config):
+def test_model_without_historical(baseline_model_config: TestConfig) -> None:
     model = Model(model=baseline_model_config.model, scen=baseline_model_config.scenario, annotation='first model test',
                   base_xls=baseline_model_config.base_xls,
                   manual_parameter_xls=baseline_model_config.manual_parameter_xls,
@@ -66,7 +66,7 @@ def test_model_without_historical(baseline_model_config):
     model.close_db()
 
 
-def test_modify_scenario(baseline_model_config):
+def test_modify_scenario(baseline_model_config: TestConfig) -> None:
     with tempfile.TemporaryDirectory() as directory:
         mod_model = ModifyModel(model=baseline_model_config.model, scen=baseline_model_config.scenario,
                                 xls_dir=directory, file_name='data.xlsx', verbose=baseline_model_config.verbose,
