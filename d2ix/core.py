@@ -355,7 +355,7 @@ class Model(DBInterface):
 
 
 class ModifyModel(DBInterface):
-    model_par: ModelPar
+    model_par: ModelPar = {}
     scenario: message_ix.Scenario
 
     def __init__(self, model: str, scen: str, run_config: Optional[str] = None,
