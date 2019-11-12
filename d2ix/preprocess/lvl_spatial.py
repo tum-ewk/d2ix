@@ -5,7 +5,7 @@ from d2ix import RawData
 logger = logging.getLogger(__name__)
 
 
-def process_lvl_spatial(_data: RawData) -> dict:
+def process_lvl_spatial(_data: RawData) -> list:
     df = _data['base_input']['lvl_spatial'].copy()
     lvl_spatial = []
     for index, row in df.iterrows():

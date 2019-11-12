@@ -5,7 +5,7 @@ from d2ix import RawData
 logger = logging.getLogger(__name__)
 
 
-def process_map_spatial_hierarchy(_data: RawData) -> dict:
+def process_map_spatial_hierarchy(_data: RawData) -> list:
     df = _data['base_input']['map_spatial_hierarchy'].copy()
     map_spatial_hierarchy = []
     for index, row in df.iterrows():

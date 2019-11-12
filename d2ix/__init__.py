@@ -15,9 +15,10 @@ ModelPar = Dict[str, Union[pd.DataFrame, list]]
 
 Data = TypedDict('Data', {'demand': dict, 'technology': dict, 'units': dict, 'locations': dict, 'lvl_spatial': list,
                           'map_spatial_hierarchy': list, 'level_renewable': str, 'level_resource': str,
-                          'technology_parameter': list})
+                          'technology_parameter': list}, total=False)
 
-RawData = TypedDict('RawData', {'base_input': dict, 'base_tech': dict, 'manual_input': dict, 'spec_techs': dict})
+RawData = TypedDict('RawData', {'base_input': dict, 'base_tech': dict, 'manual_input': dict, 'spec_techs': dict},
+                    total=False)
 
 from d2ix.core import Model
 from d2ix.core import PostProcess

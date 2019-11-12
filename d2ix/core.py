@@ -160,9 +160,9 @@ class Model(DBInterface):
 
     verbose : boolean
     """
-    data: Data
-    raw_data: RawData
-    model_par: ModelPar
+    data: Data = {}
+    raw_data: RawData = {}
+    model_par: ModelPar = {}
     active_years: list = []
     historical_years: list = []
     year_vector: list = []
@@ -176,7 +176,7 @@ class Model(DBInterface):
                  manual_parameter_xls: Optional[str] = None,
                  annotation: Optional[str] = None, historical_data: bool = True,
                  run_config: Optional[str] = None, verbose: bool = False,
-                 yaml_export: bool = True):
+                 yaml_export: bool = True) -> None:
         super().__init__(run_config, verbose, yaml_export)
 
         self.config['base_xls'] = base_xls
@@ -195,8 +195,12 @@ class Model(DBInterface):
         self.first_model_year = first_model_year
         self.last_model_year = last_model_year
         self.model_range_year = model_range_year
+
+        self._create_year_vectors()
         self._calc_duration_period()
+
         self.manual_input = False
+
         # create new message scenario
         self.scenario = self.Scenario(model, scen, 'new', annotation)
 
@@ -292,9 +296,10 @@ class Model(DBInterface):
         self.data['locations'] = process_spatial_locations(self.raw_data)
         self.data['lvl_spatial'] = process_lvl_spatial(self.raw_data)
         self.data['map_spatial_hierarchy'] = process_map_spatial_hierarchy(self.raw_data)
-        _lvls = process_level(self.raw_data)
-        for k, v in _lvls.items():
-            self.data[k] = v
+
+        _levels = process_level(self.raw_data)
+        for k, v in _levels.items():
+            getattr(self, 'data')[k] = v
 
     def _create_model(self) -> None:
         # get used parameter

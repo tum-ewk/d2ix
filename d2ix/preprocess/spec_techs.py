@@ -4,7 +4,7 @@ from typing import Tuple, List, Dict
 
 import pandas as pd
 
-from d2ix import RawData
+from d2ix import RawData, Data
 from d2ix.preprocess.base_techs import get_base_techs
 from d2ix.preprocess.util import get_year_vector
 from d2ix.util import df_to_nested_dict
@@ -12,7 +12,7 @@ from d2ix.util import df_to_nested_dict
 logger = logging.getLogger(__name__)
 
 
-def process_spec_techs(raw_data: RawData, model_data: dict, year_vector: List[int], first_model_year: int,
+def process_spec_techs(raw_data: RawData, model_data: Data, year_vector: List[int], first_model_year: int,
                        par_list: List[str], duration_period_sum: pd.DataFrame) -> dict:
     df = raw_data['base_input']['spec_techs'].copy()
     df = df.set_index('technology', drop=True)
